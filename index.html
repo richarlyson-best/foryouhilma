@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For You Hilma</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS E RESET --- */
+        :root {
+            --bg-color: #0f1111;
+            --text-main: #f0f0f0;
+            --text-muted: #a0a0a0;
+            --accent-pink: #ffc2c2;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --font-body: 'Poppins', sans-serif;
+            --font-title: 'Playfair Display', serif;
+            --spacing-section: 80px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            line-height: 1.6;
+            background-image: radial-gradient(circle at 50% 0%, #1a1515 0%, var(--bg-color) 70%);
+        }
+
+        h1, h2, h3 { font-family: var(--font-title); font-weight: 400; letter-spacing: 0.5px; }
+        .highlight { color: var(--accent-pink); font-style: italic; }
+        .name-title { font-size: 2.5rem; margin-bottom: 0.5rem; line-height: 1.2; }
+        .container { width: 90%; max-width: 600px; margin: 0 auto; padding: 0 15px; }
+        section { margin-bottom: var(--spacing-section); position: relative; opacity: 0; }
+
+        /* --- SPLASH SCREEN --- */
+        #splash {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-color); z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            flex-direction: column;
+        }
+        .heart-loader { font-size: 2rem; color: var(--accent-pink); animation: pulse 1.5s infinite; }
+
+        /* --- UI COMPONENTS --- */
+        .spotify-wrapper {
+            background: var(--card-bg); border-radius: 12px; padding: 15px;
+            border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px; margin-top: 40px;
+        }
+        .visualizer { display: flex; justify-content: center; gap: 3px; margin-top: 10px; height: 15px; align-items: flex-end; }
+        .bar { width: 3px; background: var(--accent-pink); border-radius: 3px; animation: sound 0.8s infinite ease-in-out alternate; }
+        .bar:nth-child(2) { animation-duration: 0.9s; height: 60%; }
+        .bar:nth-child(3) { animation-duration: 1.1s; height: 80%; }
+        .bar:nth-child(4) { animation-duration: 0.7s; height: 50%; }
+
+        /* --- COUNTDOWN --- */
+        .countdown-timer { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
+        .time-unit { display: flex; flex-direction: column; align-items: center; }
+        .time-val { font-family: var(--font-title); font-size: 2rem; color: var(--accent-pink); }
+        .time-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); }
+        .pulse-text { animation: pulseSoft 2s infinite; }
+
+        /* --- TYPING BOX --- */
+        .typing-box {
+            background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%);
+            padding: 25px; border-left: 2px solid var(--accent-pink);
+            border-radius: 0 10px 10px 0; min-height: 120px;
+            font-size: 1rem; color: #dcdcdc;
+        }
+        .cursor { animation: blink 1s infinite; color: var(--accent-pink); }
+
+        /* --- GRID DE MEMÓRIAS (CORREÇÃO 2: Skeleton + Blur-Up) --- */
+        .photo-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;
+        }
+        .photo-item {
+            position: relative; aspect-ratio: 3/4; border-radius: 8px;
+            overflow: hidden; background: #1a1a1a;
+        }
+        
+        /* Skeleton Animation (Shimmer) */
+        .photo-item::before {
+            content: ""; position: absolute; top:0; left:0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, #1a1a1a 0%, #252525 50%, #1a1a1a 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite linear;
+            z-index: 1;
+        }
+        .photo-item.loaded-container::before { display: none; } /* Remove skeleton após load */
+
+        /* Estados da Imagem */
+        .photo-item img {
+            width: 100%; height: 100%; object-fit: cover;
+            /* Estado inicial: blur + zoom + invisível */
+            opacity: 0; transform: scale(1.05); filter: blur(12px);
+            transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease;
+            position: absolute; top: 0; left: 0; z-index: 2;
+        }
+        /* Estado carregado */
+        .photo-item img.loaded {
+            opacity: 1; transform: scale(1); filter: blur(0);
+        }
+
+        /* --- VIDEO & BOTÕES (CORREÇÃO 1: Botões Estáveis) --- */
+        .decision-section { text-align: center; }
+        .video-wrapper {
+            position: relative; width: 100%; margin-bottom: 25px;
+            border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .video-wrapper video { width: 100%; height: auto; display: block; border-radius: 12px; }
+
+        .buttons-wrapper {
+            display: flex; justify-content: center; gap: 20px; margin-top: 20px;
+            position: relative; height: 60px; /* Altura fixa do container */
+        }
+        
+        .btn {
+            /* Dimensões fixas para evitar reflow no texto */
+            min-width: 140px; 
+            max-width: 200px;
+            height: 48px;
+            padding: 0 20px;
+            
+            border: none; border-radius: 50px;
+            font-family: var(--font-body); font-weight: 600; font-size: 0.9rem;
+            text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer; transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+            
+            /* Flex para centralizar texto */
+            display: inline-flex; align-items: center; justify-content: center;
+            white-space: nowrap; 
+            box-sizing: border-box;
+            z-index: 100;
+        }
+
+        .btn-yes { background: var(--accent-pink); color: #000; box-shadow: 0 4px 15px rgba(255, 194, 194, 0.3); }
+        .btn-no { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); }
+        
+        /* Mensagens */
+        #danger-message, #success-message { display: none; margin-top: 20px; padding: 20px; background: var(--card-bg); border-radius: 10px; }
+        .verse { font-family: var(--font-title); font-style: italic; color: var(--accent-pink); font-size: 1.1rem; margin-bottom: 10px; display: block; }
+
+        /* --- LOCKED SECTION --- */
+        .locked-section { position: relative; padding-top: 20px; }
+        .locked-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 17, 17, 0.6); backdrop-filter: blur(4px);
+            z-index: 5;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; border-radius: 8px;
+        }
+        .locked-grid img { filter: blur(15px); transition: filter 1.5s ease; }
+        .unlocked .locked-grid img { filter: blur(0); }
+        .unlocked .locked-overlay { pointer-events: none; opacity: 0; transition: opacity 0.5s; }
+
+        /* --- ANIMATIONS & FOOTER --- */
+        footer { text-align: center; padding: 40px 0 20px; font-size: 0.75rem; color: #444; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 0.8; } }
+        @keyframes pulseSoft { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        @keyframes sound { 0% { height: 20%; } 100% { height: 100%; } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        @keyframes shimmer { 0% {background-position: -200% 0;} 100% {background-position: 200% 0;} }
+
+        @media (max-width: 480px) { .name-title { font-size: 2rem; } .buttons-wrapper { gap: 10px; } }
+    </style>
+</head>
+<body>
+
+    <script>
+        // CONFIG
+        const TARGET_DATE = "2025-12-17T00:00:00"; 
+        const SPOTIFY_EMBED_URL = "https://open.spotify.com/embed/track/2Z5wXgysowvzl0nKGNGU0t?utm_source=generator"; 
+        const TYPING_MESSAGE = "Ebaaaaa, você finalmente chegou 🥺 \n\nSe está vendo isso, significa que nosso reencontro deu certo, né? \nEspero que tenha gostado, estou fazendo esse site dia 21 de novembro, falta um pouco menos de 1 mês para a sua chegada.\n\n(Estou muito ansioso pela sua chegada. Mas me diz, gostou da caixa? Se eu te disser que queria ter vivido esse momento ano passado, você acredita? Mas esse ano vai ser diferente, tá certo?)\n\nPS: Recebi uma ótima notícia que voltará dia 16, então volta 4 dias contador haha";
+        let IS_UNLOCKED = false; 
+    </script>
+
+    <div id="splash">
+        <div class="heart-loader"><i class="fa-solid fa-heart"></i></div>
+        <p style="margin-top: 10px; font-family: var(--font-title); font-size: 0.9rem; letter-spacing: 2px;">TÁ ANSIOSA NÉ? VOU TE DEIXAR ESPERANDO MAIS UM POUQUINHO</p>
+    </div>
+
+    <section class="section container">
+        <div class="spotify-wrapper">
+            <iframe style="border-radius:12px" src="" id="spotify-iframe" width="100%" height="80" frameBorder="0" loading="lazy"></iframe>
+            <div class="visualizer">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+        </div>
+        <script>document.getElementById('spotify-iframe').src = SPOTIFY_EMBED_URL;</script>
+    </section>
+
+    <section class="section container countdown-container" style="text-align: center;">
+        <h1 class="name-title pulse-text">Chega, <span class="highlight">Hilma Sophia</span></h1>
+        <p style="color: var(--text-muted); margin-bottom: 10px;">Falta pouco pro grande reencontro.</p>
+        <div class="countdown-timer" id="timer-display"></div>
+    </section>
+
+    <section class="section container">
+        <div class="typing-box">
+            <span id="typing-target"></span><span class="cursor">|</span>
+        </div>
+    </section>
+
+    <section class="section container">
+        <h2 style="text-align:center; margin-bottom:20px;">Nossos <span class="highlight">Momentos</span></h2>        
+        <div class="photo-grid">
+            <div class="photo-item">
+                <img class="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="" alt="Nós">
+            </div>
+            <div class="photo-item">
+                <img class="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="" alt="Sorriso">
+            </div>
+            <div class="photo-item">
+                <img class="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="" alt="Viagem">
+            </div>
+            <div class="photo-item">
+                <img class="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="" alt="Nós">
+            </div>
+        </div>
+        <p style="text-align:center; font-size: 0.8rem; color: #666; margin-top: 15px;">Não, a sua internet não está ruim ou o site está bugado, essa parte é para as nossas memorias e encontros que teremos enquanto você estiver aqui. Se é que me permite, é claro.</p>
+    </section>
+
+    <section class="section container decision-section">
+        <h2 style="margin-bottom: 20px;">Agora me diz...</h2>
+        <div class="video-wrapper">
+            <video controls>
+                <source src="videos/pastorrafael.mp4" type="video/mp4">
+                Seu navegador não suporta a tag de vídeo.
+            </video>
+        </div>
+        <p style="margin-bottom: 15px;">Aceita o desafio?</p>
+
+        <div class="buttons-wrapper" id="btn-container">
+            <button class="btn btn-yes" id="btn-yes">SIM</button>
+            <button class="btn btn-no" id="btn-no">NÃO</button>
+        </div>
+
+        <div id="success-message">
+            <span class="verse">"Mulher virtuosa quem a achará? O seu valor muito excede ao de rubis." (Provérbios 31:10)</span>
+            <p>Eu a encontrei. E ela está lendo isso agora. Te amo, Hilma Sophia.</p>
+        </div>
+
+        <div id="danger-message"></div>
+    </section>
+
+    <section class="section container locked-section" id="final-section">
+        <div class="locked-overlay" id="lock-overlay">
+            <i class="fa-solid fa-lock" style="font-size:2rem; color:#a0a0a0; margin-bottom:10px;"></i>
+            <p style="font-size:0.9rem; color:#ccc;">(bloqueada)<br>Você entenderá no futuro.</p>
+        </div>
+        <p style="text-align:center; margin-bottom: 15px;"><span class="highlight">Curiosa não, além...</span></p>
+        <div class="photo-grid locked-grid">
+            <div class="photo-item"><img src="https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?auto=format&fit=crop&q=80&w=600"></div>
+            <div class="photo-item"><img src="https://images.unsplash.com/photo-1494774157365-9e04c6720e47?auto=format&fit=crop&q=80&w=600"></div>
+        </div>
+        <p style="text-align:center; font-size: 0.8rem; color: #666; margin-top:15px;">Sonhei tanto com isso, estou tão grato.</p>
+        <!-- <p style="text-align:center; margin-bottom: 15px;"><span class="highlight">É, pelo visto deu certo...</span></p>
+        <div class="photo-grid locked-grid">
+            <div class="photo-item"><img src="https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?auto=format&fit=crop&q=80&w=600"></div>
+            <div class="photo-item"><img src="https://images.unsplash.com/photo-1494774157365-9e04c6720e47?auto=format&fit=crop&q=80&w=600"></div>
+        </div>
+        <p style="text-align:center; font-size: 0.8rem; color: #666; margin-top:15px;">Sonhei tanto com isso, estou tão grato.</p> -->
+    </section>
+
+    <footer><p>Criado com todo amor do mundo © 2025</p></footer>
+
+    <script>
+        // --- 1. CONFIGURAÇÕES INICIAIS ---
+        gsap.registerPlugin(ScrollTrigger);
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                gsap.to('#splash', { opacity: 0, duration: 1, onComplete: () => document.getElementById('splash').style.display = 'none' });
+                initAnimations();
+            }, 1500);
+        });
+
+        // --- 2. COUNTDOWN ---
+        function updateTimer() {
+            const gap = new Date(TARGET_DATE).getTime() - new Date().getTime();
+            const el = document.getElementById("timer-display");
+            if (gap < 0) { el.innerHTML = "<div class='time-val'>Finalmente!</div>"; return; }
+            
+            const d = Math.floor(gap / (1000 * 60 * 60 * 24));
+            const h = Math.floor((gap % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((gap % (1000 * 60 * 60)) / (1000 * 60));
+            
+            el.innerHTML = `
+                <div class="time-unit"><span class="time-val">${d}</span><span class="time-label">Dias</span></div>
+                <div class="time-unit"><span class="time-val">${h}</span><span class="time-label">Horas</span></div>
+                <div class="time-unit"><span class="time-val">${m}</span><span class="time-label">Min</span></div>
+            `;
+        }
+        setInterval(updateTimer, 1000); updateTimer();
+
+        // --- 3. TYPING ---
+        function typeWriter(text, i) {
+            if (i < text.length) {
+                document.getElementById("typing-target").innerHTML = text.substring(0, i+1);
+                setTimeout(() => typeWriter(text, i + 1), 40);
+            }
+        }
+
+        // --- 4. LAZY LOAD + BLUR UP (CORREÇÃO 2) ---
+        const imageObserver = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    const realSrc = img.getAttribute('data-src');
+                    // Inicia o carregamento
+                    img.src = realSrc;
+                    
+                    // Quando carregar, troca classes para efeito blur->sharp
+                    img.onload = () => {
+                        img.classList.add('loaded');
+                        // Remove o skeleton do container pai
+                        img.closest('.photo-item').classList.add('loaded-container');
+                    };
+                    obs.unobserve(img);
+                }
+            });
+        });
+        document.querySelectorAll('img.lazy').forEach(img => imageObserver.observe(img));
+
+        // --- 5. BOTÃO "NÃO" (CORREÇÃO 1 - LÓGICA COMPLETA) ---
+        const btnNo = document.getElementById('btn-no');
+        const btnYes = document.getElementById('btn-yes');
+        const dangerMsg = document.getElementById('danger-message');
+        const successMsg = document.getElementById('success-message');
+        
+        let attempts = 0;
+        let isMoving = false; // Debounce flag
+        let isFinalState = false; // Travado após 3 vezes
+
+        function moveButton(e) {
+            if (isFinalState) return; // Se já acabou, não faz nada (permite clique normal se quiser)
+            
+            // Impede clique/toque padrão enquanto foge
+            if(e) { e.preventDefault(); e.stopPropagation(); }
+            
+            // Debounce: evita múltiplas chamadas muito rápidas na mesma animação
+            if(isMoving) return;
+            isMoving = true;
+            setTimeout(() => isMoving = false, 250);
+
+            // Incrementa tentativa
+            attempts++;
+
+            // --- CHECAGEM DE FIM DE JOGO (3ª VEZ) ---
+            if(attempts >= 3) {
+                isFinalState = true;
+                
+                // 1. Texto do botão
+                btnNo.innerText = "TÁ BOM, PODE SER";
+                
+                // 2. Remove listeners de fuga
+                btnNo.onmouseover = null;
+                btnNo.ontouchstart = null;
+                // Ao clicar agora, age como SIM (opcional, mas melhora UX)
+                btnNo.onclick = () => btnYes.click();
+
+                // 3. Exibe a frase EXATA pedida
+                dangerMsg.style.display = 'block';
+                dangerMsg.innerHTML = `
+                    <span class="verse" style="color: var(--accent-pink);">
+                        Você não é Pedro, mas pelo visto me negou três vezes né? Acontece, mas precisamos nos ver mais vezes, né?
+                    </span>
+                `;
+                gsap.from(dangerMsg, { scale:0.9, opacity:0, duration:0.5 });
+                return;
+            }
+
+            // --- LÓGICA DE FUGA (LIMITADA E SEGURA) ---
+            
+            // 1. Transformar em fixed na primeira vez para permitir movimento livre na tela
+            // Mas calculando onde ele está agora para não pular visualmente
+            const rect = btnNo.getBoundingClientRect();
+            
+            // Se ainda não for fixed, fixa nas coordenadas atuais
+            if (btnNo.style.position !== 'fixed') {
+                btnNo.style.position = 'fixed';
+                btnNo.style.left = rect.left + 'px';
+                btnNo.style.top = rect.top + 'px';
+            }
+
+            // 2. Definir limites (Viewport - tamanho botão - margem 10px)
+            const viewportW = window.innerWidth;
+            const viewportH = window.innerHeight;
+            const btnW = rect.width;
+            const btnH = rect.height;
+            
+            // Posição da seção bloqueada (para não entrar nela)
+            const lockedSection = document.getElementById('final-section');
+            const lockedRect = lockedSection.getBoundingClientRect();
+            // Topo da seção bloqueada em relação à janela visual atual
+            const blockedTop = lockedRect.top; 
+
+            // 3. Calcular nova posição (Delta ±120px X, ±80px Y)
+            // Centralizado na posição ATUAL do botão
+            const currentLeft = parseFloat(btnNo.style.left || rect.left);
+            const currentTop = parseFloat(btnNo.style.top || rect.top);
+
+            const randomX = (Math.random() * 240) - 120; // -120 a +120
+            const randomY = (Math.random() * 160) - 80;  // -80 a +80
+
+            let newLeft = currentLeft + randomX;
+            let newTop = currentTop + randomY;
+
+            // 4. CLAMP (Grampear valores nos limites seguros)
+            // X: entre 10px e (LarguraTela - LarguraBotão - 10px)
+            newLeft = Math.max(10, Math.min(newLeft, viewportW - btnW - 10));
+
+            // Y: entre 10px e (AlturaTela - AlturaBotão - 10px)
+            // E TAMBÉM: deve ser menor que (TopoDaSeçãoBloqueada - AlturaBotão - 20px)
+            // Se a seção bloqueada não estiver visível (top muito grande), o viewportH já limita.
+            const safeBottomY = Math.min(viewportH - btnH - 10, blockedTop - btnH - 20);
+            newTop = Math.max(10, Math.min(newTop, safeBottomY));
+
+            // 5. Animar
+            gsap.to(btnNo, {
+                left: newLeft,
+                top: newTop,
+                duration: 0.3,
+                ease: "power2.out"
+            });
+        }
+
+        // Listeners para fuga
+        btnNo.addEventListener('mouseover', moveButton);
+        btnNo.addEventListener('touchstart', moveButton, {passive: false});
+        btnNo.addEventListener('click', moveButton);
+
+        // --- 6. AÇÃO DO SIM ---
+        btnYes.addEventListener('click', () => {
+            gsap.to('.buttons-wrapper', { autoAlpha: 0, height: 0, margin:0, duration: 0.5 });
+            gsap.to('.decision-section h2', { autoAlpha: 0, height: 0, margin: 0, duration: 0.5 });
+            if(dangerMsg) dangerMsg.style.display = 'none'; // Esconde mensagem de erro se houver
+            
+            successMsg.style.display = 'block';
+            gsap.from(successMsg, { scale: 0.8, opacity: 0, duration: 0.8, ease: "back.out(1.7)" });
+        });
+
+        // --- 7. DESBLOQUEIO ---
+        window.unlockFinal = function() {
+            document.getElementById('final-section').classList.add('unlocked');
+            gsap.to('#lock-overlay', { opacity: 0, duration: 1, onComplete: () => document.getElementById('lock-overlay').style.display='none' });
+        };
+        if(IS_UNLOCKED) window.unlockFinal();
+
+        // --- 8. INIT ANIMS ---
+        function initAnimations() {
+            typeWriter(TYPING_MESSAGE, 0);
+            gsap.utils.toArray('.section').forEach(sec => {
+                gsap.to(sec, { opacity: 1, y: 0, duration: 1, scrollTrigger: { trigger: sec, start: "top 85%" } });
+            });
+        }
+    </script>
+</body>
+</html>
