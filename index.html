@@ -33,26 +33,26 @@
             color: var(--text-main);
             font-family: var(--font-body);
             overflow-x: hidden;
-            line-height: 1.6;
+            /* Fundo suave do site principal */
+            background-image: radial-gradient(circle at 50% 0%, #1a1515 0%, var(--bg-color) 70%);
         }
 
-        /* --- TELA DE CARREGAMENTO (INTRO) --- */
-        #intro-overlay {
+        /* --- 1. ESTILOS DA TELA DE CARREGAMENTO (OVERLAY) --- */
+        #loading-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #0f1111; z-index: 10000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             padding: 20px; text-align: center;
         }
 
-        .intro-text {
+        .loading-text {
             font-family: var(--font-title);
             font-size: 1.2rem;
             color: var(--text-main);
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             min-height: 80px;
-            opacity: 0; 
-            max-width: 80%;
-            transition: opacity 0.5s;
+            max-width: 90%;
+            transition: opacity 0.5s ease;
         }
 
         .highlight-intro { color: var(--accent-pink); font-style: italic; }
@@ -72,52 +72,64 @@
             background: var(--accent-pink);
             border-radius: 10px;
             box-shadow: 0 0 10px var(--accent-pink);
-            /* Transição via GSAP, removido transition CSS para evitar conflito */
         }
 
         .rotate-icon {
-            font-size: 3rem; color: var(--text-muted);
+            font-size: 3rem; color: var(--accent-pink);
             margin-bottom: 20px; display: none;
             animation: rotatePhone 2s infinite ease-in-out;
         }
 
+        #ios-permission-btn {
+            display: none; margin-top: 20px; padding: 12px 24px;
+            background: var(--accent-pink); color: #000;
+            border: none; border-radius: 50px; font-weight: bold; cursor: pointer;
+            font-family: var(--font-body);
+        }
+
         @keyframes rotatePhone {
             0% { transform: rotate(0deg); }
-            50% { transform: rotate(-90deg); }
+            50% { transform: rotate(90deg); } /* Girar pra direita */
             100% { transform: rotate(0deg); }
         }
 
-        /* --- SITE PRINCIPAL (Oculto) --- */
-        #main-site { display: none; opacity: 0; }
+        /* --- 2. ESTILOS DO SITE PRINCIPAL --- */
+        #main-content { display: none; opacity: 0; }
 
-        /* Classes utilitárias do site */
         h1, h2, h3 { font-family: var(--font-title); font-weight: 400; letter-spacing: 0.5px; }
         .highlight { color: var(--accent-pink); font-style: italic; }
         .name-title { font-size: 2.5rem; margin-bottom: 0.5rem; line-height: 1.2; }
         .container { width: 90%; max-width: 600px; margin: 0 auto; padding: 0 15px; }
         section { margin-bottom: var(--spacing-section); position: relative; opacity: 0; }
-        
+
+        /* Spotify */
         .spotify-wrapper { background: var(--card-bg); border-radius: 12px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px; margin-top: 40px; }
         .visualizer { display: flex; justify-content: center; gap: 3px; margin-top: 10px; height: 15px; align-items: flex-end; }
         .bar { width: 3px; background: var(--accent-pink); border-radius: 3px; animation: sound 0.8s infinite ease-in-out alternate; }
         .bar:nth-child(2) { animation-duration: 0.9s; height: 60%; }
         
+        /* Contador */
         .countdown-timer { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
         .time-unit { display: flex; flex-direction: column; align-items: center; }
         .time-val { font-family: var(--font-title); font-size: 2rem; color: var(--accent-pink); }
         .time-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); }
         .pulse-text { animation: pulseSoft 2s infinite; }
 
+        /* Digitação */
         .typing-box { background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%); padding: 25px; border-left: 2px solid var(--accent-pink); border-radius: 0 10px 10px 0; min-height: 120px; font-size: 1rem; color: #dcdcdc; }
         .cursor { animation: blink 1s infinite; color: var(--accent-pink); }
 
+        /* Fotos */
         .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
         .photo-item { position: relative; aspect-ratio: 3/4; border-radius: 8px; overflow: hidden; background: #1a1a1a; }
+        /* Skeleton */
         .photo-item::before { content: ""; position: absolute; top:0; left:0; width: 100%; height: 100%; background: linear-gradient(90deg, #1a1a1a 0%, #252525 50%, #1a1a1a 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite linear; z-index: 1; }
         .photo-item.loaded-container::before { display: none; }
+        /* Img */
         .photo-item img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.05); filter: blur(12px); transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease; position: absolute; top: 0; left: 0; z-index: 2; }
         .photo-item img.loaded { opacity: 1; transform: scale(1); filter: blur(0); }
 
+        /* Decisão */
         .decision-section { text-align: center; }
         .video-wrapper { position: relative; width: 100%; margin-bottom: 25px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
         .video-wrapper video { width: 100%; height: auto; display: block; border-radius: 12px; }
@@ -129,6 +141,7 @@
         #danger-message, #success-message { display: none; margin-top: 20px; padding: 20px; background: var(--card-bg); border-radius: 10px; }
         .verse { font-family: var(--font-title); font-style: italic; color: var(--accent-pink); font-size: 1.1rem; margin-bottom: 10px; display: block; }
 
+        /* Bloqueio Final */
         .locked-section { position: relative; padding-top: 20px; }
         .locked-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 17, 17, 0.6); backdrop-filter: blur(4px); z-index: 5; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-radius: 8px; }
         .locked-grid img { filter: blur(15px); transition: filter 1.5s ease; }
@@ -136,7 +149,10 @@
         .unlocked .locked-overlay { pointer-events: none; opacity: 0; transition: opacity 0.5s; }
 
         footer { text-align: center; padding: 40px 0 20px; font-size: 0.75rem; color: #444; }
+
+        /* Animações */
         @keyframes pulseSoft { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        @keyframes sound { 0% { height: 20%; } 100% { height: 100%; } }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         @keyframes shimmer { 0% {background-position: -200% 0;} 100% {background-position: 200% 0;} }
         @media (max-width: 480px) { .name-title { font-size: 2rem; } .buttons-wrapper { gap: 10px; } }
@@ -144,15 +160,20 @@
 </head>
 <body>
 
-    <div id="intro-overlay">
+    <div id="loading-overlay">
         <div id="rotate-icon" class="rotate-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
-        <p class="intro-text" id="intro-text"></p>
+        
+        <p class="loading-text" id="msg-box"></p>
+        
         <div class="progress-container" id="progress-container">
             <div class="progress-bar" id="progress-bar"></div>
         </div>
+
+        <button id="ios-permission-btn">Habilitar Gravidade 🔓</button>
     </div>
 
-    <div id="main-site">
+    <div id="main-content">
+        
         <section class="section container">
             <div class="spotify-wrapper">
                 <iframe style="border-radius:12px" src="" id="spotify-iframe" width="100%" height="80" frameBorder="0" loading="lazy"></iframe>
@@ -224,246 +245,294 @@
     <script>
         /**
          * ===============================================
-         * CONFIGURAÇÃO DE DEBUG & DATAS
+         * ⚙️ CONFIGURAÇÃO DO SISTEMA
          * ===============================================
          */
-        const DEBUG_MODE = true; // Mude para TRUE para testar as janelas agora
+        
+        // Mude para TRUE se quiser testar o comportamento de 20/dez hoje
+        const DEBUG_MODE = false; 
+        const DEBUG_HOUR = 9; // Horário simulado (ex: 9 para culto, 12.5 para transição)
 
-        const CONFIG = {
-            targetDateISO: "2025-12-16T00:00:00",
+        // CONSTANTES DE DATA E HORA
+        const TARGET_DAY = 20;
+        const TARGET_MONTH = 11; // Dezembro (0-11)
+        const TARGET_YEAR = 2025;
+
+        const MIN_CULTO_START = 7 * 60;      // 07:00
+        const MIN_CULTO_END = 12 * 60;       // 12:00
+        const MIN_TRANSITION_END = 13 * 60 + 30; // 13:30
+
+        // Configurações do Site Romântico
+        const CONFIG_SITE = {
             spotifyUrl: "https://open.spotify.com/embed/track/2plxK3m1fXn2F5p4jA7Z9m?utm_source=generator",
+            targetDateISO: "2025-12-16T00:00:00",
             typingMsg: "Ebaaaaa, você finalmente chegou 🥺 \n\nSe está vendo isso, significa que nosso reencontro deu certo, né? \nEspero que tenha gostado, estou fazendo esse site dia 21 de novembro.\n\n(Estou muito ansioso pela sua chegada. Mas me diz, gostou da caixa? Se eu te disser que queria ter vivido esse momento ano passado, você acredita? Mas esse ano vai ser diferente, tá certo?)\n\nPS: Recebi uma ótima notícia que voltará dia 16, então volta 4 dias contador haha",
         };
 
-        const TARGET_DAY = 12;
-        const TARGET_MONTH = 11; // 11 = Dezembro
-        const TARGET_YEAR = 2025;
+        let IS_UNLOCKED = false; // Variável para desbloqueio manual
 
-        // Minutos
-        const TIME_START_BLOCK = 16 * 60;         // 07:00
-        const TIME_END_BLOCK = 15 * 60;          // 12:00
-        const TIME_END_TROLL = 17 * 60 + 30;     // 13:30
+        // DOM Elements (Loading)
+        const elOverlay = document.getElementById('loading-overlay');
+        const elMsg = document.getElementById('msg-box');
+        const elProgressContainer = document.getElementById('progress-container');
+        const elProgressBar = document.getElementById('progress-bar');
+        const elRotateIcon = document.getElementById('rotate-icon');
+        const btnIOS = document.getElementById('ios-permission-btn');
+        const elMain = document.getElementById('main-content');
 
-        let IS_UNLOCKED = false; 
+        let orientationGranted = false;
 
-        // ==========================================
-        // 1. INIT: CONTROLE DE TEMPO & INTRO
-        // ==========================================
-        const introText = document.getElementById('intro-text');
-        const progressBar = document.getElementById('progress-bar');
-        const progressContainer = document.getElementById('progress-container');
-        const rotateIcon = document.getElementById('rotate-icon');
+        /**
+         * ===============================================
+         * 🚀 INICIALIZAÇÃO (LOADING SCREEN)
+         * ===============================================
+         */
+        window.onload = function() {
+            initSystem();
+        };
 
-        async function initIntro() {
+        function initSystem() {
             const now = new Date();
-            const isTargetDate = (now.getDate() === TARGET_DAY && now.getMonth() === TARGET_MONTH && now.getFullYear() === TARGET_YEAR);
-            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            const currentDay = now.getDate();
+            const currentMonth = now.getMonth();
+            // Calcula minutos do dia (Ex: 12:30 = 750)
+            const currentMinutes = (DEBUG_MODE ? DEBUG_HOUR * 60 : now.getHours() * 60 + now.getMinutes());
 
-            // -----------------------------------------------------
-            // CENÁRIO A: BLOQUEIO DO CULTO (07:00 - 12:00)
-            // -----------------------------------------------------
-            // Regra: Sempre bloqueia, nunca mostra mensagem de "De novo".
-            if ((isTargetDate || DEBUG_MODE) && currentMinutes >= TIME_START_BLOCK && currentMinutes < TIME_END_BLOCK) {
-                await showText(`Você é curiosa né? Ansiosa eu já sabia, mas pelo visto você tem o combo kkkkkkk <br><br> <span class="highlight-intro">Vamos prestar atenção no culto 💛</span>`);
-                setTimeout(() => {
-                    introText.innerHTML += `<br><br><span style="font-size:0.8rem; opacity:0.7;">(Fui buscar água e você tentando me enrolar, gaiata)</span>`;
-                    gsap.fromTo(introText.lastElementChild, {opacity:0}, {opacity:0.7, duration:1});
-                }, 4000);
-                return; // Bloqueio total.
-            }
+            // Verifica se é 20/12/2025 (ou Debug)
+            const isTargetDate = (currentDay === TARGET_DAY && currentMonth === TARGET_MONTH && now.getFullYear() === TARGET_YEAR) || DEBUG_MODE;
 
-            // -----------------------------------------------------
-            // CENÁRIO B: TROLL PÓS-CULTO (12:00 - 13:30)
-            // -----------------------------------------------------
-            else if ((isTargetDate || DEBUG_MODE) && currentMinutes >= TIME_END_BLOCK && currentMinutes < TIME_END_TROLL) {
-                // Correção 1: Barra aparece imediatamente
-                progressContainer.style.display = 'block';
-                progressBar.style.width = "0%";
-                
-                // Inicia carregamento lento em background enquanto textos aparecem
-                gsap.to(progressBar, {width: "30%", duration: 4, ease: "power1.inOut"});
+            // Reset diário do contador
+            manageLocalStorage(isTargetDate);
 
-                // Correção 2: Verifica tentativas APENAS AQUI
-                const attempts = parseInt(localStorage.getItem('sophia_troll_attempts_v2') || '0');
-                localStorage.setItem('sophia_troll_attempts_v2', attempts + 1);
-
-                if (attempts > 0) {
-                    // Segunda vez em diante no horário troll
-                    await showText("De novo menina? Tá tudo bem? <br>Qualquer coisa estou aqui do seu lado kkkkkkk", 3500);
-                    // Finaliza rápido
-                    gsap.to(progressBar, {width: "100%", duration: 1});
-                    finishIntro();
-                } else {
-                    // Primeira vez: Troll Completo
-                    await runFullTrollSequence();
-                }
+            if (!isTargetDate) {
+                // Outros dias: Carregamento Simples
+                runSequenceLate(); 
                 return;
             }
 
-            // -----------------------------------------------------
-            // CENÁRIO C: PÓS 13:30 OU OUTROS DIAS
-            // -----------------------------------------------------
+            // 1. CULTO (07:00 - 12:00)
+            if (currentMinutes >= MIN_CULTO_START && currentMinutes < MIN_CULTO_END) {
+                handleCultoPhase();
+            }
+            // 2. TRANSIÇÃO (12:00 - 13:30)
+            else if (currentMinutes >= MIN_CULTO_END && currentMinutes < MIN_TRANSITION_END) {
+                handleTransitionPhase();
+            }
+            // 3. TARDE (> 13:30)
             else {
-                // Correção 2: Nunca mostra "De novo". Sempre mensagem carinhosa.
-                const isLatePostCult = (isTargetDate || DEBUG_MODE) && currentMinutes >= TIME_END_TROLL;
-                runFastLoad(isLatePostCult);
-                return;
+                runSequenceLate();
             }
         }
 
-        // --- SEQUÊNCIA TROLL COMPLETA (Correção 1 e 3) ---
-        async function runFullTrollSequence() {
-            // A barra já está em 30% (iniciada no init)
+        function manageLocalStorage(isTargetDate) {
+            const lastDate = localStorage.getItem('lastAccessDate');
+            const todayStr = new Date().toDateString();
+            if (lastDate !== todayStr) {
+                localStorage.setItem('accessCount_culto_20dez', '0');
+                localStorage.setItem('lastAccessDate', todayStr);
+            }
+        }
+
+        /* --- FASE 1: CULTO --- */
+        async function handleCultoPhase() {
+            let count = parseInt(localStorage.getItem('accessCount_culto_20dez') || '0');
+            count++;
+            localStorage.setItem('accessCount_culto_20dez', count);
+
+            elProgressContainer.style.display = 'block';
+
+            if (count === 1) {
+                await typeText(`Você é curiosa né?<br>Ansiosa eu já sabia, mas pelo visto você tem o combo kkkkkkk`);
+                await wait(3000);
+                await typeText(`Vamos prestar atenção no culto e se acalme por favor 💛`);
+                await wait(3000);
+                await typeText(`Fui buscar água e você tentando me enrolar, gaiata 😂`);
+                finishBlocked(); // Não libera
+            } 
+            else if (count === 2) {
+                await typeText(`De novo menina? Tá tudo bem?<br>Qualquer coisa estou aqui do seu lado kkkkkkk`);
+                finishBlocked(); // Não libera
+            } 
+            else {
+                // 3º acesso: Entra no desafio da física
+                await typeText(`Opaaa, pera lá, já foi uma, duas e agora 3…`);
+                await wait(2500);
+                await typeText(`Respira um pouco, tá bom?`);
+                await wait(2000);
+                await typeText(`Vou segurar por mais alguns segundinhos…`);
+                
+                await animateBar(0, 50, 2);
+                await animateBar(50, 40, 1);
+                await animateBar(40, 85, 3);
+
+                startOrientationChallenge();
+            }
+        }
+
+        function finishBlocked() {
+            gsap.to(elProgressBar, {width: "15%", duration: 1});
+        }
+
+        /* --- FASE 2: TRANSIÇÃO --- */
+        async function handleTransitionPhase() {
+            elProgressContainer.style.display = 'block';
+
+            await typeText(`Carregando...`);
+            await animateBar(0, 60, 2);
             
-            await showText("Calma lá… fique ansiosa não 😂 <br>O culto acabou nesse instante, acabamos de nos despedir haha", 4500);
+            await typeText(`Ops, acho que a barra ficou cansada, vá beber uma água enquanto isso…`);
+            await animateBar(60, 50, 1.5);
+            await wait(2000);
+
+            await animateBar(50, 85, 2);
+            await typeText(`Tá bom, já enchi sua paciência né?`);
+            await wait(2000);
+
+            startOrientationChallenge();
+        }
+
+        /* --- FASE 3: TARDE / OUTROS DIAS --- */
+        async function runSequenceLate() {
+            elProgressContainer.style.display = 'block';
+            await typeText(`Carregando...`);
+            await animateBar(0, 100, 1.5);
+            await typeText(`Fiz com carinho viu…<br>Depois me diz o que achou 💛`);
+            await wait(2500);
+            unlockSite();
+        }
+
+        /* --- LÓGICA DE ORIENTAÇÃO (GAMMA) --- */
+        async function startOrientationChallenge() {
+            await typeText(`Pra ser mais rápido, deixe o celular <span class="highlight-intro">deitado pra direita</span>.`);
+            elRotateIcon.style.display = 'block';
             
-            // Barra continua subindo
-            gsap.to(progressBar, {width: "55%", duration: 3});
-            await showText("Respira um pouco, tá bom?", 3000);
-
-            // Momento da trava
-            gsap.to(progressBar, {width: "88%", duration: 2});
-            await showText("Vou segurar só mais alguns segundinhos...", 2000);
-            
-            // Barra volta (Troll)
-            gsap.to(progressBar, {width: "65%", duration: 1, ease: "power2.out"});
-            await showText("Ops, acho que a barra cansou kkkkk vá beber uma água por enquanto...", 3000);
-            await showText("Tá bom, já enchi sua paciência né?", 2500);
-
-            // --- Correção 3: Detecção de Orientação ---
-            // Verifica se é mobile (touch) para exigir rotação
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-            if (isMobile) {
-                // FLUXO MOBILE: OBRIGATÓRIO VIRAR
-                await showText("Pra ser mais rápido, <span class='highlight-intro'>deixe o celular de cabeça para baixo</span> (vire ele)", 0);
-                rotateIcon.style.display = 'block';
-
-                const turned = await waitForTiltMobile(); // Espera virar ou timeout com mensagem de física
-
-                if (turned) {
-                    rotateIcon.style.display = 'none';
-                    await showText("Boa! Agora pode voltar, já vai abrir...", 2000);
-                }
+            // Permissão iOS
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                btnIOS.style.display = 'block';
+                btnIOS.onclick = requestIOSPermission;
             } else {
-                // FLUXO DESKTOP: Pula a física, carrega direto
-                await showText("Carregando os últimos detalhes...", 1500);
+                window.addEventListener('deviceorientation', handleOrientation);
             }
 
-            // Finaliza
-            gsap.to(progressBar, {width: "100%", duration: 0.8});
-            await showText("Pronto, pode colocar na posição normal, mas depois me diz o que achou 💛<br><br>Eu te amo viu.", 4000);
-
-            finishIntro();
-        }
-
-        // --- CARREGAMENTO RÁPIDO ---
-        async function runFastLoad(isLatePostCult = false) {
-            progressContainer.style.display = 'block';
-            progressBar.style.width = "0%";
-            gsap.to(progressBar, {width: "100%", duration: 1.5});
-
-            if (isLatePostCult) {
-                await showText("Fiz com carinho viu, depois me diz o que achou...", 1500);
-            } else {
-                await showText("Carregando nosso amor...", 1000);
-            }
-            finishIntro();
-        }
-
-        // --- LÓGICA DE DETECÇÃO (Correção 3) ---
-        function waitForTiltMobile() {
-            return new Promise(resolve => {
-                let solved = false;
-                let physicsMessageShown = false;
-
-                // Handler do sensor
-                const handleMotion = (e) => {
-                    // Detecta virada brusca (Beta > 120 ou < -120)
-                    if (!solved && (e.beta > 120 || e.beta < -120 || e.gamma > 120 || e.gamma < -120)) {
-                        solved = true;
-                        window.removeEventListener('deviceorientation', handleMotion);
-                        resolve(true);
-                    }
-                };
-
-                // Tenta adicionar o listener
-                if (window.DeviceOrientationEvent) {
-                    window.addEventListener('deviceorientation', handleMotion);
+            // Timeout para mensagem de física
+            setTimeout(() => {
+                if (!orientationGranted) {
+                    typeText(`Vamos lá, tô aguardando…<br>Se não, a barra não cai 👀<br><span style="font-size:0.8rem">(É física viu… sua matéria preferida)</span>`);
                 }
+            }, 6000);
+        }
 
-                // Timeout: Se não virar em 6 segundos, mostra a mensagem da Física
-                setTimeout(async () => {
-                    if (!solved) {
-                        physicsMessageShown = true;
-                        // Mostra mensagem de cobrança
-                        await showText("Vamos lá, estou aguardando… se não a barra não cai. <br>(É física viu… sua matéria preferida)", 0);
-                        
-                        // Fallback final: Se mesmo após a mensagem ela não conseguir (sensor quebrado/bug),
-                        // liberamos após mais 6 segundos para não travar o site eternamente.
-                        setTimeout(() => {
-                            if (!solved) {
-                                solved = true;
-                                window.removeEventListener('deviceorientation', handleMotion);
-                                resolve(true); // Libera por piedade
-                            }
-                        }, 6000);
+        function requestIOSPermission() {
+            DeviceOrientationEvent.requestPermission()
+                .then(response => {
+                    if (response === 'granted') {
+                        btnIOS.style.display = 'none';
+                        window.addEventListener('deviceorientation', handleOrientation);
+                    } else {
+                        alert("Preciso da permissão para funcionar!");
                     }
-                }, 6000);
-            });
+                })
+                .catch(console.error);
         }
 
-        // --- UTILS ---
-        function showText(html, duration = 0) {
-            return new Promise(resolve => {
-                gsap.to(introText, { opacity: 0, duration: 0.5, onComplete: () => {
-                    introText.innerHTML = html;
-                    gsap.to(introText, { opacity: 1, duration: 0.5 });
-                }});
-                if (duration > 0) setTimeout(resolve, duration);
-                else resolve(); 
-            });
-        }
+        function handleOrientation(event) {
+            const gamma = event.gamma; 
 
-        function finishIntro() {
-            gsap.to('#intro-overlay', { 
-                opacity: 0, duration: 1, 
-                onComplete: () => {
-                    document.getElementById('intro-overlay').style.display = 'none';
-                    document.getElementById('main-site').style.display = 'block';
-                    gsap.to('#main-site', { opacity: 1, duration: 1 });
-                    initMainSite();
+            if (!orientationGranted) {
+                // Validação Gamma: 30 a 90 (Deitado Direita)
+                if (gamma > 30 && gamma < 90) {
+                    successRightSide();
                 } 
+                // Errado (Esquerda)
+                else if (gamma < -30) {
+                    elMsg.innerHTML = `Ei, virou pro lado errado kkkkk<br>A barra vai subir assim 😂<br>Vira pro outro lado…`;
+                }
+            }
+        }
+
+        let isUnlocking = false;
+        async function successRightSide() {
+            if (isUnlocking) return;
+            isUnlocking = true;
+            orientationGranted = true;
+
+            window.removeEventListener('deviceorientation', handleOrientation);
+            elRotateIcon.style.display = 'none';
+
+            await typeText(`Agora sim! Depois me diz o que achou 💛`);
+            
+            gsap.to(elProgressBar, {width: "100%", duration: 0.8, ease: "bounce.out"});
+            await wait(1500);
+            
+            await typeText(`Depois coloque ele na posição normal…`);
+            await wait(2000);
+            
+            unlockSite();
+        }
+
+        /* --- UTILS DO LOADING --- */
+        function typeText(html) {
+            return new Promise(resolve => {
+                elMsg.style.opacity = 0;
+                setTimeout(() => {
+                    elMsg.innerHTML = html;
+                    elMsg.style.opacity = 1;
+                    setTimeout(resolve, 500);
+                }, 500);
+            });
+        }
+        function animateBar(from, to, duration) {
+            return new Promise(resolve => {
+                gsap.fromTo(elProgressBar, { width: from + "%" }, { width: to + "%", duration: duration, ease: "power1.inOut", onComplete: resolve });
+            });
+        }
+        function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+        function unlockSite() {
+            gsap.to(elOverlay, {
+                opacity: 0, duration: 1,
+                onComplete: () => {
+                    elOverlay.style.display = 'none';
+                    elMain.style.display = 'block';
+                    gsap.to(elMain, { opacity: 1, duration: 1 });
+                    initMainSite(); // Inicia o site romântico
+                }
             });
         }
 
-        window.onload = initIntro;
 
-
-        // ==========================================
-        // 2. LÓGICA DO SITE PRINCIPAL (MANTIDA)
-        // ==========================================
+        /**
+         * ===============================================
+         * 3. LÓGICA DO SITE ROMÂNTICO PRINCIPAL
+         * ===============================================
+         */
         function initMainSite() {
             gsap.registerPlugin(ScrollTrigger);
-            document.getElementById('spotify-iframe').src = CONFIG.spotifyUrl;
-            
+
+            // Spotify
+            document.getElementById('spotify-iframe').src = CONFIG_SITE.spotifyUrl;
+
             // Timer
             setInterval(updateTimer, 1000); updateTimer();
+
             // Typing
-            typeWriter(CONFIG.typingMsg, 0);
-            // Lazy
+            typeMainText(CONFIG_SITE.typingMsg, 0);
+
+            // Lazy Load
             setupLazyLoad();
-            // Anims
+
+            // Animações Scroll
             gsap.utils.toArray('.section').forEach(sec => {
                 gsap.to(sec, { opacity: 1, y: 0, duration: 1, scrollTrigger: { trigger: sec, start: "top 85%" } });
             });
-            // Unlock Check
+
+            // Check Desbloqueio Final
             if(IS_UNLOCKED) unlockFinal();
         }
 
-        // Helpers do Site Principal
+        // --- Funções Auxiliares do Site ---
         function updateTimer() {
-            const gap = new Date(CONFIG.targetDateISO).getTime() - new Date().getTime();
+            const gap = new Date(CONFIG_SITE.targetDateISO).getTime() - new Date().getTime();
             const el = document.getElementById("timer-display");
             if (gap < 0) { el.innerHTML = "<div class='time-val'>Finalmente!</div>"; return; }
             const d = Math.floor(gap / 86400000);
@@ -473,12 +542,14 @@
                             <div class="time-unit"><span class="time-val">${h}</span><span class="time-label">Horas</span></div>
                             <div class="time-unit"><span class="time-val">${m}</span><span class="time-label">Min</span></div>`;
         }
-        function typeWriter(text, i) {
+
+        function typeMainText(text, i) {
             if (i < text.length) {
                 document.getElementById("typing-target").innerHTML = text.substring(0, i+1);
-                setTimeout(() => typeWriter(text, i + 1), 40);
+                setTimeout(() => typeMainText(text, i + 1), 40);
             }
         }
+
         function setupLazyLoad() {
             const obs = new IntersectionObserver((entries, o) => {
                 entries.forEach(e => {
@@ -492,10 +563,11 @@
             document.querySelectorAll('img.lazy').forEach(img => obs.observe(img));
         }
 
-        // Botão NÃO (Blindado)
+        // --- Lógica do Botão NÃO (Fuga) ---
         const btnNo = document.getElementById('btn-no');
         const btnYes = document.getElementById('btn-yes');
         const dangerMsg = document.getElementById('danger-message');
+        const successMsg = document.getElementById('success-message');
         let attemptsNo = 0, isMoving = false, isFinalState = false;
 
         function moveButton(e) {
@@ -509,12 +581,19 @@
                 isFinalState = true;
                 btnNo.innerText = "TÁ BOM, PODE SER";
                 btnNo.onclick = () => btnYes.click();
+                
+                // Remove listeners
+                btnNo.removeEventListener('mouseover', moveButton);
+                btnNo.removeEventListener('touchstart', moveButton);
+                btnNo.removeEventListener('click', moveButton);
+                
                 dangerMsg.style.display = 'block';
                 dangerMsg.innerHTML = `<span class="verse" style="color: var(--accent-pink);">Você não é Pedro, mas pelo visto me negou três vezes né? Acontece, mas precisamos nos ver mais vezes, né?</span>`;
                 gsap.from(dangerMsg, { scale:0.9, opacity:0, duration:0.5 });
                 return;
             }
 
+            // Cálculo da Fuga
             const rect = btnNo.getBoundingClientRect();
             if (btnNo.style.position !== 'fixed') {
                 btnNo.style.position = 'fixed'; btnNo.style.left = rect.left + 'px'; btnNo.style.top = rect.top + 'px';
@@ -524,26 +603,31 @@
             
             let newL = parseFloat(btnNo.style.left) + ((Math.random() * 240) - 120);
             let newT = parseFloat(btnNo.style.top) + ((Math.random() * 160) - 80);
+            // Limites seguros
             newL = Math.max(10, Math.min(newL, vpW - rect.width - 10));
             newT = Math.max(10, Math.min(newT, Math.min(vpH - rect.height - 10, blockedTop - rect.height - 20)));
+            
             gsap.to(btnNo, { left: newL, top: newT, duration: 0.3, ease: "power2.out" });
         }
         btnNo.addEventListener('mouseover', moveButton);
         btnNo.addEventListener('touchstart', moveButton, {passive: false});
         btnNo.addEventListener('click', moveButton);
 
+        // --- Botão SIM ---
         btnYes.addEventListener('click', () => {
             gsap.to('.buttons-wrapper', { autoAlpha: 0, height: 0, margin:0, duration: 0.5 });
             gsap.to('.decision-section h2', { autoAlpha: 0, height: 0, margin: 0, duration: 0.5 });
-            dangerMsg.style.display = 'none';
-            document.getElementById('success-message').style.display = 'block';
-            gsap.from('#success-message', { scale: 0.8, opacity: 0, duration: 0.8, ease: "back.out(1.7)" });
+            if(dangerMsg) dangerMsg.style.display = 'none';
+            successMsg.style.display = 'block';
+            gsap.from(successMsg, { scale: 0.8, opacity: 0, duration: 0.8, ease: "back.out(1.7)" });
         });
 
+        // --- Desbloqueio Final ---
         window.unlockFinal = function() {
             document.getElementById('final-section').classList.add('unlocked');
             gsap.to('#lock-overlay', { opacity: 0, duration: 1, onComplete: () => document.getElementById('lock-overlay').style.display='none' });
         };
+
     </script>
 </body>
 </html>
